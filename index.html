@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PayBoss - Kalkulator Stok Minuman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
+  <div class="max-w-7xl mx-auto p-4 md:p-6">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-3 mb-3">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xl">☕</span>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800">PayBoss</h1>
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xl">💧</span>
+      </div>
+      <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
+        Kalkulator Stok Bahan Minuman — hitung kebutuhan bahan berdasarkan penjualan, 
+        pantau stok, dan integrasikan data ke Google Sheet (read & write).
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Panel Penjualan -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-5">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-xl font-semibold flex items-center gap-2">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-amber-700">📊</span>
+            <span>Input Penjualan Hari Ini</span>
+          </h2>
+          <button
+            id="btn-reset"
+            class="flex items-center gap-1 text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            <span class="text-xs">⟳</span>
+            Reset
+          </button>
+        </div>
+
+        <div
+          id="menu-list"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto pr-2"
+        ></div>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <div class="flex items-center gap-2 text-amber-700 font-medium mb-1">
+              <span class="text-lg">📈</span>
+              <span>Estimasi Revenue</span>
+            </div>
+            <p id="revenue" class="text-2xl font-bold text-amber-800">
+              Rp 0
+            </p>
+          </div>
+          <div class="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div class="flex items-center gap-2 text-blue-700 font-medium mb-1">
+              <span class="text-lg">📦</span>
+              <span>Total Bahan Terpakai</span>
+            </div>
+            <p class="text-2xl font-bold text-blue-800">
+              <span id="total-ingredients">0</span> jenis bahan
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Mode & Ringkasan Stok -->
+      <div class="space-y-6">
+        <!-- Mode -->
+        <div class="bg-white rounded-2xl shadow-lg p-5">
+          <h3 class="font-medium mb-3 flex items-center gap-2">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple-100 text-purple-700">⚗️</span>
+            <span>Mode</span>
+          </h3>
+          <div class="flex items-center space-x-3">
+            <label class="flex items-center cursor-pointer">
+              <div class="relative">
+                <input id="mode-toggle" type="checkbox" class="sr-only" />
+                <div
+                  id="mode-toggle-bg"
+                  class="block w-12 h-6 rounded-full transition-colors bg-gray-300"
+                ></div>
+                <div
+                  id="mode-toggle-knob"
+                  class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"
+                ></div>
+              </div>
+              <div id="mode-label" class="ml-3 text-gray-700 font-medium">
+                Simulasi
+              </div>
+            </label>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            Matikan mode simulasi untuk <span class="font-semibold">mengurangi stok aktual</span> setelah hitung.
+          </p>
+        </div>
+
+        <!-- Ringkasan Stok Kritis -->
+        <div class="bg-white rounded-2xl shadow-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-100 text-red-600">⚠️</span>
+            <h3 id="critical-title" class="font-medium text-green-600">
+              Stok Aman
+            </h3>
+          </div>
+          <ul id="critical-list" class="space-y-2 text-sm text-gray-500">
+            <li>Tidak ada bahan di bawah batas aman.</li>
+          </ul>
+        </div>
+
+        <!-- Tombol Hitung & Update -->
+        <button
+          id="btn-update"
+          class="w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 
+                 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
+                 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span class="text-lg">🧮</span>
+          <span id="btn-update-text">Hitung Kebutuhan</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hasil Kalkulasi -->
+    <section id="result-section" class="bg-white rounded-2xl shadow-lg p-5 mb-8 hidden">
+      <h2 class="text-xl font-semibold mb-5 flex items-center gap-2">
+        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-green-100 text-green-700">✅</span>
+        <span>Kebutuhan Bahan Hari Ini</span>
+      </h2>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Bahan</th>
+              <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Dibutuhkan</th>
+              <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Stok Saat Ini</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+            </tr>
+          </thead>
+          <tbody id="usage-table-body" class="divide-y divide-gray-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="text-center text-xs md:text-sm text-gray-500 mt-8">
+      © <span id="year"></span> PayBoss — Kalkulator Stok Bahan Minuman (Terhubung Google Sheet)
+    </div>
+  </div>
+
+  <script>
+    // ==============================
+    // KONFIGURASI GOOGLE APPS SCRIPT
+    // ==============================
+    // Ganti dengan URL Web App Google Apps Script Anda (Deploy > Web app)
+    // Contoh: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec"; // TODO: isi URL Web App di sini
+
+    // Struktur data yang diharapkan dari Apps Script (GET ?action=getStock):
+    // {
+    //   stock: {
+    //     sirup: { current: 3000, safe: 1000, unit: "ml" },
+    //     kopi: { current: 1800, safe: 600, unit: "ml" },
+    //     ...
+    //   }
+    // }
+
+    // Apps Script (POST) akan menerima JSON seperti ini:
+    // {
+    //   action: "saveUsage",
+    //   date: "2025-11-17T10:00:00.000Z",
+    //   usage: [ { key, displayName, total, unit, currentStock, safeStock, status }, ... ],
+    //   revenue: 350000,
+    //   stock: { ... stok terbaru setelah dikurangi ... }
+    // }
+
+    // ==============================
+    // DATA RESEP MENU (dari kode React)
+    // ==============================
+    const menuRecipes = [
+      {
+        name: "Clasic Almond",
+        price: 25000,
+        ingredients: [
+          { name: "sirup", amount: 15, unit: "ml" },
+          { name: "creamer", amount: 20, unit: "ml" },
+          { name: "gula", amount: 10, unit: "ml" },
+          { name: "kopi", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Caramel",
+        price: 25000,
+        ingredients: [
+          { name: "sirup", amount: 15, unit: "ml" },
+          { name: "creamer", amount: 20, unit: "ml" },
+          { name: "gula", amount: 5, unit: "ml" },
+          { name: "kopi", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Brown sugar",
+        price: 23000,
+        ingredients: [
+          { name: "sirup", amount: 15, unit: "ml" },
+          { name: "creamer", amount: 20, unit: "ml" },
+          { name: "kopi", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Banana",
+        price: 25000,
+        ingredients: [
+          { name: "sirup", amount: 15, unit: "ml" },
+          { name: "creamer", amount: 20, unit: "ml" },
+          { name: "gula", amount: 5, unit: "ml" },
+          { name: "kopi", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Butter scoot",
+        price: 30000,
+        ingredients: [
+          { name: "sirup mur", amount: 5, unit: "ml" },
+          { name: "sirup", amount: 15, unit: "ml" },
+          { name: "creamer", amount: 20, unit: "ml" },
+          { name: "kopi", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Vanilla",
+        price: 25000,
+        ingredients: [
+          { name: "sirup", amount: 15, unit: "ml" },
+          { name: "creamer", amount: 20, unit: "ml" },
+          { name: "gula", amount: 5, unit: "ml" },
+          { name: "kopi", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Kopi Matcha",
+        price: 25000,
+        ingredients: [
+          { name: "matcha", amount: 20, unit: "ml" },
+          { name: "kopi", amount: 20, unit: "ml" },
+          { name: "gula", amount: 10, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Spanish latte",
+        price: 23000,
+        ingredients: [
+          { name: "skm", amount: 20, unit: "ml" },
+          { name: "creamer", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+          { name: "kopi", amount: 15, unit: "ml" },
+        ],
+      },
+      {
+        name: "Kiwi kiss",
+        price: 28000,
+        ingredients: [
+          { name: "markisa", amount: 15, unit: "ml" },
+          { name: "kiwi", amount: 7, unit: "ml" },
+          { name: "lemon tea", amount: 10, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Summer glow",
+        price: 25000,
+        ingredients: [
+          { name: "manggo sauce", amount: 15, unit: "ml" },
+          { name: "sirup strawberry", amount: 10, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Ocean blue",
+        price: 28000,
+        ingredients: [
+          { name: "Strawberry sauce", amount: 20, unit: "ml" },
+          { name: "blue curacao", amount: 10, unit: "ml" },
+          { name: "mint", amount: 5, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Flora pop",
+        price: 23000,
+        ingredients: [
+          { name: "honey", amount: 15, unit: "ml" },
+          { name: "rashberry", amount: 10, unit: "ml" },
+          { name: "jasmine", amount: 5, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Lembayung senja",
+        price: 28000,
+        ingredients: [
+          { name: "Lemon tea", amount: 10, unit: "ml" },
+          { name: "Wildberries", amount: 10, unit: "ml" },
+          { name: "Blue curacao", amount: 15, unit: "ml" },
+          { name: "Lychee", amount: 15, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Midnight bloom",
+        price: 25000,
+        ingredients: [
+          { name: "wildberry", amount: 20, unit: "ml" },
+          { name: "mint", amount: 10, unit: "ml" },
+          { name: "kopi", amount: 15, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Dark moon",
+        price: 25000,
+        ingredients: [
+          { name: "kiwi", amount: 20, unit: "ml" },
+          { name: "blue curacao", amount: 10, unit: "ml" },
+          { name: "kopi", amount: 10, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Tropical zing",
+        price: 25000,
+        ingredients: [
+          { name: "kiwi", amount: 20, unit: "ml" },
+          { name: "lychee", amount: 10, unit: "ml" },
+          { name: "lemon tea", amount: 10, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Honey smooth",
+        price: 28000,
+        ingredients: [
+          { name: "honey", amount: 10, unit: "ml" },
+          { name: "wildberry", amount: 15, unit: "ml" },
+          { name: "jasmine", amount: 8, unit: "ml" },
+          { name: "lemon tea", amount: 10, unit: "ml" },
+          { name: "soda", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Matcha",
+        price: 23000,
+        ingredients: [
+          { name: "Base", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Taro",
+        price: 23000,
+        ingredients: [
+          { name: "base", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Coklat",
+        price: 23000,
+        ingredients: [
+          { name: "base", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Cookies and cream",
+        price: 23000,
+        ingredients: [
+          { name: "base", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Red Velvet",
+        price: 23000,
+        ingredients: [
+          { name: "base", amount: 20, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+        ],
+      },
+      {
+        name: "Lemon tea",
+        price: 15000,
+        ingredients: [
+          { name: "base", amount: 1, unit: "unit" },
+          { name: "air", amount: 200, unit: "ml" },
+        ],
+      },
+    ];
+
+    // Normalisasi nama bahan (case & plural insensitive)
+    function normalizeIngredient(name) {
+      return name
+        .toLowerCase()
+        .trim()
+        .replace(/s$/, "")
+        .replace(/\s+/g, "");
+    }
+
+    // Stok default (boleh di-overwrite dari Google Sheet)
+    const defaultStock = {
+      sirup: { current: 3000, safe: 1000, unit: "ml" },
+      "sirup mur": { current: 1500, safe: 500, unit: "ml" },
+      "sirup strawberry": { current: 1000, safe: 300, unit: "ml" },
+      creamer: { current: 2500, safe: 800, unit: "ml" },
+      gula: { current: 2000, safe: 500, unit: "ml" },
+      kopi: { current: 1800, safe: 600, unit: "ml" },
+      susu: { current: 10000, safe: 2000, unit: "ml" },
+      skm: { current: 1200, safe: 400, unit: "ml" },
+      matcha: { current: 800, safe: 200, unit: "ml" },
+      "Strawberry sauce": { current: 900, safe: 300, unit: "ml" },
+      "manggo sauce": { current: 800, safe: 250, unit: "ml" },
+      markisa: { current: 700, safe: 200, unit: "ml" },
+      kiwi: { current: 600, safe: 150, unit: "ml" },
+      "blue curacao": { current: 500, safe: 100, unit: "ml" },
+      lychee: { current: 400, safe: 100, unit: "ml" },
+      "Lemon tea": { current: 1200, safe: 400, unit: "ml" },
+      wildberry: { current: 500, safe: 150, unit: "ml" },
+      Wildberries: { current: 500, safe: 150, unit: "ml" },
+      honey: { current: 800, safe: 300, unit: "ml" },
+      jasmine: { current: 400, safe: 100, unit: "ml" },
+      mint: { current: 300, safe: 100, unit: "ml" },
+      soda: { current: 15000, safe: 3000, unit: "ml" },
+      base: { current: 2000, safe: 500, unit: "ml" },
+      air: { current: 50000, safe: 10000, unit: "ml" },
+      rashberry: { current: 300, safe: 100, unit: "ml" },
+    };
+
+    // ==============================
+    // STATE & DOM ELEMENTS
+    // ==============================
+    let sales = {};
+    menuRecipes.forEach((m) => {
+      sales[m.name] = 0;
+    });
+
+    let stock = JSON.parse(JSON.stringify(defaultStock));
+    let ingredientUsage = [];
+    let simulateMode = true;
+    let lastTotalRevenue = 0;
+
+    const menuListEl = document.getElementById("menu-list");
+    const revenueEl = document.getElementById("revenue");
+    const totalIngredientsEl = document.getElementById("total-ingredients");
+    const modeToggleEl = document.getElementById("mode-toggle");
+    const modeToggleBgEl = document.getElementById("mode-toggle-bg");
+    const modeToggleKnobEl = document.getElementById("mode-toggle-knob");
+    const modeLabelEl = document.getElementById("mode-label");
+    const criticalTitleEl = document.getElementById("critical-title");
+    const criticalListEl = document.getElementById("critical-list");
+    const resultSectionEl = document.getElementById("result-section");
+    const usageTableBodyEl = document.getElementById("usage-table-body");
+    const btnUpdateEl = document.getElementById("btn-update");
+    const btnUpdateTextEl = document.getElementById("btn-update-text");
+    const btnResetEl = document.getElementById("btn-reset");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // ==============================
+    // UI HELPERS
+    // ==============================
+    function updateModeUI() {
+      if (simulateMode) {
+        modeToggleEl.checked = false;
+        modeToggleBgEl.classList.remove("bg-green-500");
+        modeToggleBgEl.classList.add("bg-gray-300");
+        modeToggleKnobEl.classList.remove("translate-x-6");
+        modeLabelEl.textContent = "Simulasi";
+        btnUpdateTextEl.textContent = "Hitung Kebutuhan";
+      } else {
+        modeToggleEl.checked = true;
+        modeToggleBgEl.classList.remove("bg-gray-300");
+        modeToggleBgEl.classList.add("bg-green-500");
+        modeToggleKnobEl.classList.add("translate-x-6");
+        modeLabelEl.textContent = "Update Stok";
+        btnUpdateTextEl.textContent = "Hitung & Kurangi Stok";
+      }
+    }
+
+    function createMenuListUI() {
+      menuListEl.innerHTML = "";
+      menuRecipes.forEach((menu) => {
+        const card = document.createElement("div");
+        card.className =
+          "border border-gray-200 rounded-xl p-3 hover:shadow-md transition-shadow bg-white";
+
+        const topRow = document.createElement("div");
+        topRow.className = "flex justify-between items-start gap-2";
+
+        const info = document.createElement("div");
+        const title = document.createElement("h3");
+        title.className = "font-medium text-gray-800";
+        title.textContent = menu.name;
+
+        const price = document.createElement("p");
+        price.className = "text-xs text-gray-500";
+        price.textContent = `Rp ${menu.price.toLocaleString("id-ID")}`;
+
+        info.appendChild(title);
+        info.appendChild(price);
+
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.value = "0";
+        input.className =
+          "menu-qty-input w-20 px-2 py-1 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm";
+        input.addEventListener("input", (e) => {
+          handleSaleChange(menu.name, e.target.value);
+        });
+
+        topRow.appendChild(info);
+        topRow.appendChild(input);
+        card.appendChild(topRow);
+        menuListEl.appendChild(card);
+      });
+    }
+
+    // ==============================
+    // PERHITUNGAN KEBUTUHAN BAHAN
+    // ==============================
+    function calculateIngredientUsage() {
+      const usageMap = {};
+
+      Object.entries(sales).forEach(([menuName, qty]) => {
+        const jumlah = parseInt(qty, 10) || 0;
+        if (jumlah <= 0) return;
+        const menu = menuRecipes.find((m) => m.name === menuName);
+        if (!menu) return;
+
+        menu.ingredients.forEach(({ name, amount, unit }) => {
+          const key = normalizeIngredient(name);
+          if (!usageMap[key]) {
+            usageMap[key] = { total: 0, unit, displayNames: new Set() };
+          }
+          usageMap[key].total += amount * jumlah;
+          usageMap[key].displayNames.add(name);
+        });
+      });
+
+      const result = [];
+      Object.entries(usageMap).forEach(([key, data]) => {
+        const stockInfo = stock[key] || { current: 0, safe: 0, unit: data.unit };
+        let status = "safe";
+        if (stockInfo.current < stockInfo.safe * 0.5) status = "critical";
+        else if (stockInfo.current < stockInfo.safe) status = "warning";
+
+        result.push({
+          key,
+          displayName: Array.from(data.displayNames).join(" / "),
+          total: Math.round(data.total * 100) / 100,
+          unit: data.unit,
+          currentStock: stockInfo.current,
+          safeStock: stockInfo.safe,
+          status,
+        });
+      });
+
+      // urutkan dari kebutuhan terbanyak
+      result.sort((a, b) => b.total - a.total);
+      return result;
+    }
+
+    function recalcAll() {
+      ingredientUsage = calculateIngredientUsage();
+
+      // Hitung revenue
+      let totalRevenue = 0;
+      menuRecipes.forEach((menu) => {
+        const qty = parseInt(sales[menu.name] || 0, 10) || 0;
+        totalRevenue += qty * menu.price;
+      });
+      lastTotalRevenue = totalRevenue;
+      revenueEl.textContent = "Rp " + totalRevenue.toLocaleString("id-ID");
+
+      totalIngredientsEl.textContent = ingredientUsage.length.toString();
+
+      // Tombol Update
+      const disabled = ingredientUsage.length === 0;
+      btnUpdateEl.disabled = disabled;
+
+      // Ringkasan stok kritis
+      const critical = ingredientUsage.filter((i) => i.status === "critical");
+      criticalListEl.innerHTML = "";
+      if (critical.length > 0) {
+        criticalTitleEl.textContent = `${critical.length} Bahan Kritis`;
+        criticalTitleEl.className = "font-medium text-red-600";
+
+        critical.forEach((item) => {
+          const li = document.createElement("li");
+          li.className = "flex justify-between text-sm";
+          li.innerHTML = `
+            <span class="font-medium">${item.displayName}</span>
+            <span class="text-red-600 font-mono">${item.currentStock} ${item.unit}</span>
+          `;
+          criticalListEl.appendChild(li);
+        });
+      } else {
+        criticalTitleEl.textContent = "Stok Aman";
+        criticalTitleEl.className = "font-medium text-green-600";
+        const li = document.createElement("li");
+        li.textContent = "Tidak ada bahan di bawah batas aman.";
+        li.className = "text-sm text-gray-500";
+        criticalListEl.appendChild(li);
+      }
+
+      // Tabel hasil
+      if (ingredientUsage.length === 0) {
+        resultSectionEl.classList.add("hidden");
+        usageTableBodyEl.innerHTML = "";
+        return;
+      }
+
+      resultSectionEl.classList.remove("hidden");
+      usageTableBodyEl.innerHTML = "";
+
+      ingredientUsage.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-gray-50";
+
+        let statusBadge = "";
+        if (item.status === "critical") {
+          statusBadge =
+            '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">⚠️ Kritis</span>';
+        } else if (item.status === "warning") {
+          statusBadge =
+            '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">⚠️ Peringatan</span>';
+        } else {
+          statusBadge =
+            '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">✔ Aman</span>';
+        }
+
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-medium text-gray-800">${item.displayName}</td>
+          <td class="px-4 py-3 text-right font-mono text-amber-700">${item.total} ${item.unit}</td>
+          <td class="px-4 py-3 text-right font-mono">${item.currentStock} ${item.unit}</td>
+          <td class="px-4 py-3 text-center">${statusBadge}</td>
+        `;
+        usageTableBodyEl.appendChild(tr);
+      });
+    }
+
+    // ==============================
+    // GOOGLE SHEET INTEGRATION
+    // ==============================
+    function loadStockFromSheet() {
+      if (https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec) {
+        // jika belum diisi, pakai stok default saja
+        recalcAll();
+        return;
+      }
+
+      fetch(SCRIPT_URL + "?action=getStock")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.stock) {
+            // merge stok sheet dengan default (jika ada key baru)
+            stock = Object.assign({}, stock, data.stock);
+          }
+          recalcAll();
+        })
+        .catch((err) => {
+          console.error("Gagal load stok dari Google Sheet:", err);
+          // tetap lanjut pakai stok default
+          recalcAll();
+        });
+    }
+
+    function saveUsageToSheet(usageSnapshot, revenueSnapshot) {
+      if (https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec) {
+        console.warn("SCRIPT_URL belum diisi, skip kirim ke Google Sheet.");
+        return;
+      }
+
+      const payload = {
+        action: "saveUsage",
+        date: new Date().toISOString(),
+        usage: usageSnapshot,
+        revenue: revenueSnapshot,
+        stock: stock,
+      };
+
+      // mode: 'no-cors' sering dipakai untuk Apps Script; jika ingin baca respon, bisa diatur di Apps Script & hapus no-cors
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then(() => {
+          console.log("Data penggunaan bahan terkirim ke Google Sheet.");
+        })
+        .catch((err) => {
+          console.error("Gagal kirim data ke Google Sheet:", err);
+        });
+    }
+
+    // ==============================
+    // EVENT HANDLERS
+    // ==============================
+    function handleSaleChange(menuName, value) {
+      const num = Math.max(0, parseInt(value || "0", 10) || 0);
+      sales[menuName] = num;
+      recalcAll();
+    }
+
+    function resetSales() {
+      menuRecipes.forEach((menu) => {
+        sales[menu.name] = 0;
+      });
+      document.querySelectorAll(".menu-qty-input").forEach((input) => {
+        input.value = "0";
+      });
+      recalcAll();
+    }
+
+    // Klik tombol Hitung / Update Stok
+    btnUpdateEl.addEventListener("click", () => {
+      if (ingredientUsage.length === 0) {
+        alert("Isi dulu penjualan hari ini.");
+        return;
+      }
+
+      // Snapshot sebelum di-reset
+      const usageSnapshot = JSON.parse(JSON.stringify(ingredientUsage));
+      const revenueSnapshot = lastTotalRevenue;
+
+      // Jika bukan simulasi, kurangi stok aktual
+      if (!simulateMode) {
+        usageSnapshot.forEach((item) => {
+          if (!stock[item.key]) {
+            stock[item.key] = { current: 0, safe: 0, unit: item.unit };
+          }
+          const current = parseFloat(stock[item.key].current || 0);
+          const after = current - item.total;
+          stock[item.key].current = after > 0 ? Math.round(after * 100) / 100 : 0;
+        });
+      }
+
+      // Kirim ke Google Sheet (log penggunaan & stok terbaru)
+      saveUsageToSheet(usageSnapshot, revenueSnapshot);
+
+      // Reset penjualan setelah proses
+      resetSales();
+    });
+
+    // Toggle mode simulasi / update stok
+    modeToggleEl.addEventListener("change", () => {
+      simulateMode = !simulateMode; // checkbox ON artinya update stok
+      updateModeUI();
+    });
+
+    // Tombol reset
+    btnResetEl.addEventListener("click", () => {
+      resetSales();
+    });
+
+    // ==============================
+    // INIT
+    // ==============================
+    function init() {
+      createMenuListUI();
+      updateModeUI();
+      loadStockFromSheet();
+    }
+
+    window.addEventListener("DOMContentLoaded", init);
+  </script>
+
+  <!--
+  =====================================
+  CONTOH GOOGLE APPS SCRIPT (BACKEND)
+  =====================================
+
+  // 1) Buat Google Sheet untuk stok & log
+  // 2) Buka Apps Script, paste contoh di bawah, sesuaikan nama sheet
+  // 3) Deploy > New deployment > Web app
+  //    - Execute as: Me
+  //    - Who has access: Anyone with the link
+  // 4) Copy URL Web App ke konstanta SCRIPT_URL di atas
+
+  const STOCK_SHEET_NAME = 'Stock';
+  const LOG_SHEET_NAME = 'LogUsage';
+
+  function doGet(e) {
+    const action = e.parameter.action;
+    if (action === 'getStock') {
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const sh = ss.getSheetByName(STOCK_SHEET_NAME);
+      const values = sh.getDataRange().getValues();
+      // Asumsi header: name | current | safe | unit
+      const stock = {};
+      for (let i = 1; i < values.length; i++) {
+        const [name, current, safe, unit] = values[i];
+        if (!name) continue;
+        const key = String(name).toLowerCase().trim().replace(/s$/, '').replace(/\s+/g, '');
+        stock[key] = { current, safe, unit };
+      }
+      return ContentService
+        .createTextOutput(JSON.stringify({ stock }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: 'Unknown action' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  function doPost(e) {
+    const body = JSON.parse(e.postData.contents);
+    if (body.action === 'saveUsage') {
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+      // Log penggunaan
+      const logSh = ss.getSheetByName(LOG_SHEET_NAME);
+      if (logSh && body.usage) {
+        body.usage.forEach(item => {
+          logSh.appendRow([
+            new Date(body.date || new Date()),
+            item.displayName,
+            item.key,
+            item.total,
+            item.unit,
+            body.revenue || 0,
+            item.currentStock,
+            item.safeStock,
+            item.status,
+          ]);
+        });
+      }
+
+      // Update stok (optional): tulis balik ke sheet STOCK
+      if (body.stock) {
+        const stockSh = ss.getSheetByName(STOCK_SHEET_NAME);
+        const values = stockSh.getDataRange().getValues();
+        const header = values[0];
+        // name | current | safe | unit
+        for (let i = 1; i < values.length; i++) {
+          const name = values[i][0];
+          if (!name) continue;
+          const key = String(name).toLowerCase().trim().replace(/s$/, '').replace(/\s+/g, '');
+          if (body.stock[key]) {
+            stockSh.getRange(i + 1, 2).setValue(body.stock[key].current); // kolom current
+          }
+        }
+      }
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'ok' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'no-action' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  -->
+</body>
+</html>
