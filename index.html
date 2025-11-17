@@ -17,7 +17,7 @@
       </div>
       <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
         Kalkulator Stok Bahan Minuman — hitung kebutuhan bahan berdasarkan penjualan, 
-        pantau stok, dan integrasikan data ke Google Sheet (read & write).
+        pantau stok, dan integrasikan data ke Google Sheet (read &amp; write).
       </p>
     </div>
 
@@ -153,27 +153,8 @@
     // ==============================
     // KONFIGURASI GOOGLE APPS SCRIPT
     // ==============================
-    // Ganti dengan URL Web App Google Apps Script Anda (Deploy > Web app)
-    // Contoh: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec";
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec"; // TODO: isi URL Web App di sini
-
-    // Struktur data yang diharapkan dari Apps Script (GET ?action=getStock):
-    // {
-    //   stock: {
-    //     sirup: { current: 3000, safe: 1000, unit: "ml" },
-    //     kopi: { current: 1800, safe: 600, unit: "ml" },
-    //     ...
-    //   }
-    // }
-
-    // Apps Script (POST) akan menerima JSON seperti ini:
-    // {
-    //   action: "saveUsage",
-    //   date: "2025-11-17T10:00:00.000Z",
-    //   usage: [ { key, displayName, total, unit, currentStock, safeStock, status }, ... ],
-    //   revenue: 350000,
-    //   stock: { ... stok terbaru setelah dikurangi ... }
-    // }
+    // URL Web App Google Apps Script (sudah kamu berikan)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec";
 
     // ==============================
     // DATA RESEP MENU (dari kode React)
@@ -414,7 +395,7 @@
         .replace(/\s+/g, "");
     }
 
-    // Stok default (boleh di-overwrite dari Google Sheet)
+    // Stok default (fallback kalau GAS tidak jalan), nanti dioverride dari Google Sheet
     const defaultStock = {
       sirup: { current: 3000, safe: 1000, unit: "ml" },
       "sirup mur": { current: 1500, safe: 500, unit: "ml" },
@@ -573,7 +554,6 @@
         });
       });
 
-      // urutkan dari kebutuhan terbanyak
       result.sort((a, b) => b.total - a.total);
       return result;
     }
@@ -592,11 +572,9 @@
 
       totalIngredientsEl.textContent = ingredientUsage.length.toString();
 
-      // Tombol Update
       const disabled = ingredientUsage.length === 0;
       btnUpdateEl.disabled = disabled;
 
-      // Ringkasan stok kritis
       const critical = ingredientUsage.filter((i) => i.status === "critical");
       criticalListEl.innerHTML = "";
       if (critical.length > 0) {
@@ -621,7 +599,6 @@
         criticalListEl.appendChild(li);
       }
 
-      // Tabel hasil
       if (ingredientUsage.length === 0) {
         resultSectionEl.classList.add("hidden");
         usageTableBodyEl.innerHTML = "";
@@ -661,8 +638,7 @@
     // GOOGLE SHEET INTEGRATION
     // ==============================
     function loadStockFromSheet() {
-      if (https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec) {
-        // jika belum diisi, pakai stok default saja
+      if (!SCRIPT_URL) {
         recalcAll();
         return;
       }
@@ -671,20 +647,18 @@
         .then((res) => res.json())
         .then((data) => {
           if (data && data.stock) {
-            // merge stok sheet dengan default (jika ada key baru)
             stock = Object.assign({}, stock, data.stock);
           }
           recalcAll();
         })
         .catch((err) => {
           console.error("Gagal load stok dari Google Sheet:", err);
-          // tetap lanjut pakai stok default
           recalcAll();
         });
     }
 
     function saveUsageToSheet(usageSnapshot, revenueSnapshot) {
-      if (https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec) {
+      if (!SCRIPT_URL) {
         console.warn("SCRIPT_URL belum diisi, skip kirim ke Google Sheet.");
         return;
       }
@@ -697,7 +671,6 @@
         stock: stock,
       };
 
-      // mode: 'no-cors' sering dipakai untuk Apps Script; jika ingin baca respon, bisa diatur di Apps Script & hapus no-cors
       fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -733,43 +706,36 @@
       recalcAll();
     }
 
-    // Klik tombol Hitung / Update Stok
     btnUpdateEl.addEventListener("click", () => {
       if (ingredientUsage.length === 0) {
         alert("Isi dulu penjualan hari ini.");
         return;
       }
 
-      // Snapshot sebelum di-reset
       const usageSnapshot = JSON.parse(JSON.stringify(ingredientUsage));
       const revenueSnapshot = lastTotalRevenue;
 
-      // Jika bukan simulasi, kurangi stok aktual
       if (!simulateMode) {
         usageSnapshot.forEach((item) => {
-          if (!stock[item.key]) {
-            stock[item.key] = { current: 0, safe: 0, unit: item.unit };
+          const key = item.key;
+          if (!stock[key]) {
+            stock[key] = { current: 0, safe: 0, unit: item.unit };
           }
-          const current = parseFloat(stock[item.key].current || 0);
+          const current = parseFloat(stock[key].current || 0);
           const after = current - item.total;
-          stock[item.key].current = after > 0 ? Math.round(after * 100) / 100 : 0;
+          stock[key].current = after > 0 ? Math.round(after * 100) / 100 : 0;
         });
       }
 
-      // Kirim ke Google Sheet (log penggunaan & stok terbaru)
       saveUsageToSheet(usageSnapshot, revenueSnapshot);
-
-      // Reset penjualan setelah proses
       resetSales();
     });
 
-    // Toggle mode simulasi / update stok
     modeToggleEl.addEventListener("change", () => {
-      simulateMode = !simulateMode; // checkbox ON artinya update stok
+      simulateMode = !simulateMode;
       updateModeUI();
     });
 
-    // Tombol reset
     btnResetEl.addEventListener("click", () => {
       resetSales();
     });
@@ -791,87 +757,8 @@
   CONTOH GOOGLE APPS SCRIPT (BACKEND)
   =====================================
 
-  // 1) Buat Google Sheet untuk stok & log
-  // 2) Buka Apps Script, paste contoh di bawah, sesuaikan nama sheet
-  // 3) Deploy > New deployment > Web app
-  //    - Execute as: Me
-  //    - Who has access: Anyone with the link
-  // 4) Copy URL Web App ke konstanta SCRIPT_URL di atas
+  // Ini hanya contoh, GS final kamu sudah kita buat terpisah.
 
-  const STOCK_SHEET_NAME = 'Stock';
-  const LOG_SHEET_NAME = 'LogUsage';
-
-  function doGet(e) {
-    const action = e.parameter.action;
-    if (action === 'getStock') {
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-      const sh = ss.getSheetByName(STOCK_SHEET_NAME);
-      const values = sh.getDataRange().getValues();
-      // Asumsi header: name | current | safe | unit
-      const stock = {};
-      for (let i = 1; i < values.length; i++) {
-        const [name, current, safe, unit] = values[i];
-        if (!name) continue;
-        const key = String(name).toLowerCase().trim().replace(/s$/, '').replace(/\s+/g, '');
-        stock[key] = { current, safe, unit };
-      }
-      return ContentService
-        .createTextOutput(JSON.stringify({ stock }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-    return ContentService
-      .createTextOutput(JSON.stringify({ error: 'Unknown action' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-
-  function doPost(e) {
-    const body = JSON.parse(e.postData.contents);
-    if (body.action === 'saveUsage') {
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-      // Log penggunaan
-      const logSh = ss.getSheetByName(LOG_SHEET_NAME);
-      if (logSh && body.usage) {
-        body.usage.forEach(item => {
-          logSh.appendRow([
-            new Date(body.date || new Date()),
-            item.displayName,
-            item.key,
-            item.total,
-            item.unit,
-            body.revenue || 0,
-            item.currentStock,
-            item.safeStock,
-            item.status,
-          ]);
-        });
-      }
-
-      // Update stok (optional): tulis balik ke sheet STOCK
-      if (body.stock) {
-        const stockSh = ss.getSheetByName(STOCK_SHEET_NAME);
-        const values = stockSh.getDataRange().getValues();
-        const header = values[0];
-        // name | current | safe | unit
-        for (let i = 1; i < values.length; i++) {
-          const name = values[i][0];
-          if (!name) continue;
-          const key = String(name).toLowerCase().trim().replace(/s$/, '').replace(/\s+/g, '');
-          if (body.stock[key]) {
-            stockSh.getRange(i + 1, 2).setValue(body.stock[key].current); // kolom current
-          }
-        }
-      }
-
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: 'ok' }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'no-action' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
   -->
 </body>
 </html>
