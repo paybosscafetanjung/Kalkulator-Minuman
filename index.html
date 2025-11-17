@@ -38,6 +38,10 @@
           </button>
         </div>
 
+        <!-- Tabs Kategori -->
+        <div id="category-tabs" class="flex flex-wrap gap-2 mb-4"></div>
+
+        <!-- List Menu per Kategori -->
         <div
           id="menu-list"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto pr-2"
@@ -153,13 +157,53 @@
     // ==============================
     // KONFIGURASI GOOGLE APPS SCRIPT
     // ==============================
-    // URL Web App Google Apps Script (sudah kamu berikan)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec";
 
     // ==============================
-    // DATA RESEP MENU (dari kode React)
+    // DATA RESEP MENU
     // ==============================
     const menuRecipes = [
+      // Hot Coffee
+      {
+        name: "Cappucino",
+        price: 25000,
+        ingredients: [
+          { name: "kopi", amount: 30, unit: "ml" },
+          { name: "susu", amount: 120, unit: "ml" },
+          { name: "creamer", amount: 10, unit: "ml" },
+          { name: "gula", amount: 10, unit: "ml" },
+        ],
+      },
+      {
+        name: "Caffe latte",
+        price: 25000,
+        ingredients: [
+          { name: "kopi", amount: 25, unit: "ml" },
+          { name: "susu", amount: 130, unit: "ml" },
+          { name: "gula", amount: 10, unit: "ml" },
+        ],
+      },
+      {
+        name: "Split",
+        price: 25000,
+        ingredients: [
+          { name: "kopi", amount: 35, unit: "ml" },
+          { name: "susu", amount: 90, unit: "ml" },
+          { name: "creamer", amount: 10, unit: "ml" },
+          { name: "gula", amount: 5, unit: "ml" },
+        ],
+      },
+      {
+        name: "Magic",
+        price: 25000,
+        ingredients: [
+          { name: "kopi", amount: 35, unit: "ml" },
+          { name: "susu", amount: 100, unit: "ml" },
+          { name: "gula", amount: 8, unit: "ml" },
+        ],
+      },
+
+      // Kopi susu
       {
         name: "Clasic Almond",
         price: 25000,
@@ -245,6 +289,8 @@
           { name: "kopi", amount: 15, unit: "ml" },
         ],
       },
+
+      // Mocktail
       {
         name: "Kiwi kiss",
         price: 28000,
@@ -336,6 +382,8 @@
           { name: "soda", amount: 100, unit: "ml" },
         ],
       },
+
+      // Non coffee (bubuk / base)
       {
         name: "Matcha",
         price: 23000,
@@ -386,7 +434,34 @@
       },
     ];
 
-    // Normalisasi nama bahan (case & plural insensitive)
+    // Kategori menu untuk tampilan input penjualan
+    const menuCategories = {
+      "Hot Coffee": ["Cappucino", "Caffe latte", "Split", "Magic"],
+      "Non Coffee": ["Matcha", "Red Velvet", "Taro", "Coklat", "Cookies and cream", "Lemon tea"],
+      "Mocktail": [
+        "Kiwi kiss",
+        "Summer glow",
+        "Ocean blue",
+        "Flora pop",
+        "Lembayung senja",
+        "Midnight bloom",
+        "Dark moon",
+        "Tropical zing",
+        "Honey smooth",
+      ],
+      "Kopi Susu": [
+        "Clasic Almond",
+        "Banana",
+        "Caramel",
+        "Vanilla",
+        "Brown sugar",
+        "Butter scoot",
+        "Kopi Matcha",
+        "Spanish latte",
+      ],
+    };
+
+    // Normalisasi nama bahan
     function normalizeIngredient(name) {
       return name
         .toLowerCase()
@@ -395,7 +470,7 @@
         .replace(/\s+/g, "");
     }
 
-    // Stok default (fallback kalau GAS tidak jalan), nanti dioverride dari Google Sheet
+    // Stok default (fallback kalau GAS gagal)
     const defaultStock = {
       sirup: { current: 3000, safe: 1000, unit: "ml" },
       "sirup mur": { current: 1500, safe: 500, unit: "ml" },
@@ -436,8 +511,10 @@
     let ingredientUsage = [];
     let simulateMode = true;
     let lastTotalRevenue = 0;
+    let activeCategory = "Hot Coffee";
 
     const menuListEl = document.getElementById("menu-list");
+    const categoryTabsEl = document.getElementById("category-tabs");
     const revenueEl = document.getElementById("revenue");
     const totalIngredientsEl = document.getElementById("total-ingredients");
     const modeToggleEl = document.getElementById("mode-toggle");
@@ -475,9 +552,43 @@
       }
     }
 
+    function createCategoryTabsUI() {
+      categoryTabsEl.innerHTML = "";
+      Object.keys(menuCategories).forEach((cat) => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        btn.className =
+          "category-tab px-3 py-1.5 rounded-full text-xs md:text-sm border transition-colors";
+        if (cat === activeCategory) {
+          btn.classList.add("bg-amber-500", "text-white", "border-amber-500");
+        } else {
+          btn.classList.add(
+            "bg-white",
+            "text-gray-700",
+            "border-gray-200",
+            "hover:bg-gray-100"
+          );
+        }
+        btn.addEventListener("click", () => {
+          activeCategory = cat;
+          createCategoryTabsUI();
+          createMenuListUI();
+        });
+        categoryTabsEl.appendChild(btn);
+      });
+    }
+
     function createMenuListUI() {
       menuListEl.innerHTML = "";
-      menuRecipes.forEach((menu) => {
+      let menusToRender;
+      if (activeCategory && menuCategories[activeCategory]) {
+        const allowed = new Set(menuCategories[activeCategory]);
+        menusToRender = menuRecipes.filter((m) => allowed.has(m.name));
+      } else {
+        menusToRender = menuRecipes;
+      }
+
+      menusToRender.forEach((menu) => {
         const card = document.createElement("div");
         card.className =
           "border border-gray-200 rounded-xl p-3 hover:shadow-md transition-shadow bg-white";
@@ -500,7 +611,7 @@
         const input = document.createElement("input");
         input.type = "number";
         input.min = "0";
-        input.value = "0";
+        input.value = sales[menu.name] ?? 0;
         input.className =
           "menu-qty-input w-20 px-2 py-1 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm";
         input.addEventListener("input", (e) => {
@@ -744,6 +855,7 @@
     // INIT
     // ==============================
     function init() {
+      createCategoryTabsUI();
       createMenuListUI();
       updateModeUI();
       loadStockFromSheet();
@@ -751,14 +863,5 @@
 
     window.addEventListener("DOMContentLoaded", init);
   </script>
-
-  <!--
-  =====================================
-  CONTOH GOOGLE APPS SCRIPT (BACKEND)
-  =====================================
-
-  // Ini hanya contoh, GS final kamu sudah kita buat terpisah.
-
-  -->
 </body>
 </html>
