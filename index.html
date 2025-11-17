@@ -1,867 +1,329 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PayBoss - Kalkulator Stok Minuman</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayBoss – Kalkulator & Manajemen Stok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
-  <div class="max-w-7xl mx-auto p-4 md:p-6">
-    <!-- Header -->
-    <div class="text-center mb-8">
-      <div class="flex items-center justify-center gap-3 mb-3">
-        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xl">☕</span>
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800">PayBoss</h1>
-        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xl">💧</span>
+
+<body class="bg-gray-100">
+
+<!-- ======================================================
+   NAVBAR
+====================================================== -->
+<div class="w-full bg-white shadow mb-6">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+    <h2 class="text-lg font-semibold">PayBoss Inventory System</h2>
+    <div class="flex gap-3">
+      <button id="nav-calc" class="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-sm">Kalkulator</button>
+      <button id="nav-stock" class="px-3 py-1.5 rounded-lg bg-gray-200 text-sm">Manajemen Stok</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+    PAGE 1 – KALKULATOR PENJUALAN
+====================================================== -->
+<div id="page-calc" class="max-w-7xl mx-auto px-4">
+
+  <h1 class="text-3xl font-bold text-gray-800 mb-4">
+    Kalkulator Stok Bahan Minuman
+  </h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- ==============================
+         INPUT PENJUALAN
+    =============================== -->
+    <div class="bg-white p-5 rounded-2xl shadow">
+
+      <h2 class="text-xl font-bold mb-3">Input Penjualan Harian</h2>
+
+      <!-- KATEGORI -->
+      <div class="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+
+        <!-- ================= HOT COFFEE ================= -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2">Hot Coffee</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div>Cappucino <input class="qty-input" data-menu="Cappucino" type="number"></div>
+            <div>Caffe latte <input class="qty-input" data-menu="Caffe latte" type="number"></div>
+            <div>Split <input class="qty-input" data-menu="Split" type="number"></div>
+            <div>Magic <input class="qty-input" data-menu="Magic" type="number"></div>
+          </div>
+        </div>
+
+        <!-- ================= NON COFFEE ================= -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2">Non Coffee</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div>Matcha <input class="qty-input" data-menu="Matcha" type="number"></div>
+            <div>Red Velvet <input class="qty-input" data-menu="Red Velvet" type="number"></div>
+            <div>Taro <input class="qty-input" data-menu="Taro" type="number"></div>
+            <div>Coklat <input class="qty-input" data-menu="Coklat" type="number"></div>
+            <div>Cookies and cream <input class="qty-input" data-menu="Cookies and cream" type="number"></div>
+            <div>Lemon Tea <input class="qty-input" data-menu="Lemon Tea" type="number"></div>
+          </div>
+        </div>
+
+        <!-- ================= MOCKTAIL ================= -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2">Mocktail</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div>Kiwi kiss <input class="qty-input" data-menu="Kiwi kiss" type="number"></div>
+            <div>Summer Glow <input class="qty-input" data-menu="Summer Glow" type="number"></div>
+            <div>Ocean blue <input class="qty-input" data-menu="Ocean blue" type="number"></div>
+            <div>Flora pop <input class="qty-input" data-menu="Flora pop" type="number"></div>
+            <div>Lembayung senja <input class="qty-input" data-menu="Lembayung senja" type="number"></div>
+            <div>Midnight bloom <input class="qty-input" data-menu="Midnight bloom" type="number"></div>
+            <div>Dark moon <input class="qty-input" data-menu="Dark moon" type="number"></div>
+            <div>Tropical zing <input class="qty-input" data-menu="Tropical zing" type="number"></div>
+            <div>Honey smooth <input class="qty-input" data-menu="Honey smooth" type="number"></div>
+          </div>
+        </div>
+
+        <!-- ================= KOPI SUSU ================= -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2">Kopi Susu</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div>Clasic Almond <input class="qty-input" data-menu="Clasic Almond" type="number"></div>
+            <div>Banana <input class="qty-input" data-menu="Banana" type="number"></div>
+            <div>Caramel <input class="qty-input" data-menu="Caramel" type="number"></div>
+            <div>Vanilla <input class="qty-input" data-menu="Vanilla" type="number"></div>
+            <div>Brown sugar <input class="qty-input" data-menu="Brown sugar" type="number"></div>
+            <div>Butterscott <input class="qty-input" data-menu="Butterscott" type="number"></div>
+            <div>Kopi matcha <input class="qty-input" data-menu="Kopi matcha" type="number"></div>
+            <div>Spanish Latte <input class="qty-input" data-menu="Spanish Latte" type="number"></div>
+          </div>
+        </div>
+
       </div>
-      <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
-        Kalkulator Stok Bahan Minuman — hitung kebutuhan bahan berdasarkan penjualan, 
-        pantau stok, dan integrasikan data ke Google Sheet (read &amp; write).
-      </p>
+
+      <button id="btn-calc" class="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg w-full">
+        Hitung Kebutuhan Bahan
+      </button>
+
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <!-- Panel Penjualan -->
-      <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-5">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-xl font-semibold flex items-center gap-2">
-            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-amber-700">📊</span>
-            <span>Input Penjualan Hari Ini</span>
-          </h2>
-          <button
-            id="btn-reset"
-            class="flex items-center gap-1 text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-          >
-            <span class="text-xs">⟳</span>
-            Reset
-          </button>
-        </div>
+    <!-- ==============================
+         OUTPUT HASIL
+    =============================== -->
+    <div id="calc-result" class="bg-white p-5 rounded-2xl shadow hidden">
 
-        <!-- Tabs Kategori -->
-        <div id="category-tabs" class="flex flex-wrap gap-2 mb-4"></div>
+      <h2 class="text-xl font-bold mb-3">Hasil Kebutuhan Bahan</h2>
+      <div id="calc-table"></div>
 
-        <!-- List Menu per Kategori -->
-        <div
-          id="menu-list"
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto pr-2"
-        ></div>
-
-        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-          <div class="flex-1 bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <div class="flex items-center gap-2 text-amber-700 font-medium mb-1">
-              <span class="text-lg">📈</span>
-              <span>Estimasi Revenue</span>
-            </div>
-            <p id="revenue" class="text-2xl font-bold text-amber-800">
-              Rp 0
-            </p>
-          </div>
-          <div class="flex-1 bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <div class="flex items-center gap-2 text-blue-700 font-medium mb-1">
-              <span class="text-lg">📦</span>
-              <span>Total Bahan Terpakai</span>
-            </div>
-            <p class="text-2xl font-bold text-blue-800">
-              <span id="total-ingredients">0</span> jenis bahan
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panel Mode & Ringkasan Stok -->
-      <div class="space-y-6">
-        <!-- Mode -->
-        <div class="bg-white rounded-2xl shadow-lg p-5">
-          <h3 class="font-medium mb-3 flex items-center gap-2">
-            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple-100 text-purple-700">⚗️</span>
-            <span>Mode</span>
-          </h3>
-          <div class="flex items-center space-x-3">
-            <label class="flex items-center cursor-pointer">
-              <div class="relative">
-                <input id="mode-toggle" type="checkbox" class="sr-only" />
-                <div
-                  id="mode-toggle-bg"
-                  class="block w-12 h-6 rounded-full transition-colors bg-gray-300"
-                ></div>
-                <div
-                  id="mode-toggle-knob"
-                  class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"
-                ></div>
-              </div>
-              <div id="mode-label" class="ml-3 text-gray-700 font-medium">
-                Simulasi
-              </div>
-            </label>
-          </div>
-          <p class="text-xs text-gray-500 mt-2">
-            Matikan mode simulasi untuk <span class="font-semibold">mengurangi stok aktual</span> setelah hitung.
-          </p>
-        </div>
-
-        <!-- Ringkasan Stok Kritis -->
-        <div class="bg-white rounded-2xl shadow-lg p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-100 text-red-600">⚠️</span>
-            <h3 id="critical-title" class="font-medium text-green-600">
-              Stok Aman
-            </h3>
-          </div>
-          <ul id="critical-list" class="space-y-2 text-sm text-gray-500">
-            <li>Tidak ada bahan di bawah batas aman.</li>
-          </ul>
-        </div>
-
-        <!-- Tombol Hitung & Update -->
-        <button
-          id="btn-update"
-          class="w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 
-                 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
-                 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span class="text-lg">🧮</span>
-          <span id="btn-update-text">Hitung Kebutuhan</span>
-        </button>
-      </div>
+      <button id="btn-update-stock" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg w-full">
+        Kurangi Stok
+      </button>
     </div>
 
-    <!-- Hasil Kalkulasi -->
-    <section id="result-section" class="bg-white rounded-2xl shadow-lg p-5 mb-8 hidden">
-      <h2 class="text-xl font-semibold mb-5 flex items-center gap-2">
-        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-green-100 text-green-700">✅</span>
-        <span>Kebutuhan Bahan Hari Ini</span>
-      </h2>
+  </div>
+</div>
 
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Bahan</th>
-              <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Dibutuhkan</th>
-              <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Stok Saat Ini</th>
-              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-            </tr>
-          </thead>
-          <tbody id="usage-table-body" class="divide-y divide-gray-200"></tbody>
-        </table>
+<!-- ======================================================
+    PAGE 2 – MANAJEMEN STOK
+====================================================== -->
+<div id="page-stock" class="hidden max-w-6xl mx-auto px-4">
+
+  <h2 class="text-2xl font-bold mb-4">Manajemen Stok</h2>
+
+  <table class="w-full text-sm bg-white rounded-xl shadow overflow-hidden">
+    <thead class="bg-gray-100 font-semibold">
+      <tr>
+        <th class="border px-3 py-2">Nama Bahan</th>
+        <th class="border px-3 py-2">Current</th>
+        <th class="border px-3 py-2">Safe</th>
+        <th class="border px-3 py-2">Unit</th>
+        <th class="border px-3 py-2">Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="stock-table-body"></tbody>
+  </table>
+
+  <button id="btn-add-stock" class="mt-5 px-4 py-2 bg-blue-600 text-white rounded-lg">
+    + Tambah Stok Baru
+  </button>
+
+  <!-- FORM EDIT / ADD -->
+  <div id="stock-form" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+    <div class="bg-white p-5 rounded-xl w-96 shadow-xl">
+
+      <h3 id="form-title" class="text-xl font-bold mb-3">Tambah Stok</h3>
+
+      <input id="form-name" placeholder="Nama bahan" class="w-full p-2 border rounded mb-2">
+      <input id="form-current" type="number" placeholder="Current" class="w-full p-2 border rounded mb-2">
+      <input id="form-safe" type="number" placeholder="Safe" class="w-full p-2 border rounded mb-2">
+      <input id="form-unit" placeholder="Unit" class="w-full p-2 border rounded mb-2">
+
+      <div class="flex justify-end gap-2">
+        <button id="form-cancel" class="px-4 py-2 bg-gray-300 rounded">Batal</button>
+        <button id="form-save" class="px-4 py-2 bg-green-600 text-white rounded">Simpan</button>
       </div>
-    </section>
 
-    <div class="text-center text-xs md:text-sm text-gray-500 mt-8">
-      © <span id="year"></span> PayBoss — Kalkulator Stok Bahan Minuman (Terhubung Google Sheet)
     </div>
   </div>
 
-  <script>
-    // ==============================
-    // KONFIGURASI GOOGLE APPS SCRIPT
-    // ==============================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec";
+</div>
 
-    // ==============================
-    // DATA RESEP MENU
-    // ==============================
-    const menuRecipes = [
-      // Hot Coffee
-      {
-        name: "Cappucino",
-        price: 25000,
-        ingredients: [
-          { name: "kopi", amount: 30, unit: "ml" },
-          { name: "susu", amount: 120, unit: "ml" },
-          { name: "creamer", amount: 10, unit: "ml" },
-          { name: "gula", amount: 10, unit: "ml" },
-        ],
-      },
-      {
-        name: "Caffe latte",
-        price: 25000,
-        ingredients: [
-          { name: "kopi", amount: 25, unit: "ml" },
-          { name: "susu", amount: 130, unit: "ml" },
-          { name: "gula", amount: 10, unit: "ml" },
-        ],
-      },
-      {
-        name: "Split",
-        price: 25000,
-        ingredients: [
-          { name: "kopi", amount: 35, unit: "ml" },
-          { name: "susu", amount: 90, unit: "ml" },
-          { name: "creamer", amount: 10, unit: "ml" },
-          { name: "gula", amount: 5, unit: "ml" },
-        ],
-      },
-      {
-        name: "Magic",
-        price: 25000,
-        ingredients: [
-          { name: "kopi", amount: 35, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-          { name: "gula", amount: 8, unit: "ml" },
-        ],
-      },
+<!-- ======================================================
+   SCRIPT
+====================================================== -->
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGY-EiVFQf-QtcWKnQO_g-iy8objzfEts5DNBaWlofnvQV7UiIcGQTnu8p6ZW-eOs/exec";
 
-      // Kopi susu
-      {
-        name: "Clasic Almond",
-        price: 25000,
-        ingredients: [
-          { name: "sirup", amount: 15, unit: "ml" },
-          { name: "creamer", amount: 20, unit: "ml" },
-          { name: "gula", amount: 10, unit: "ml" },
-          { name: "kopi", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Caramel",
-        price: 25000,
-        ingredients: [
-          { name: "sirup", amount: 15, unit: "ml" },
-          { name: "creamer", amount: 20, unit: "ml" },
-          { name: "gula", amount: 5, unit: "ml" },
-          { name: "kopi", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Brown sugar",
-        price: 23000,
-        ingredients: [
-          { name: "sirup", amount: 15, unit: "ml" },
-          { name: "creamer", amount: 20, unit: "ml" },
-          { name: "kopi", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Banana",
-        price: 25000,
-        ingredients: [
-          { name: "sirup", amount: 15, unit: "ml" },
-          { name: "creamer", amount: 20, unit: "ml" },
-          { name: "gula", amount: 5, unit: "ml" },
-          { name: "kopi", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Butter scoot",
-        price: 30000,
-        ingredients: [
-          { name: "sirup mur", amount: 5, unit: "ml" },
-          { name: "sirup", amount: 15, unit: "ml" },
-          { name: "creamer", amount: 20, unit: "ml" },
-          { name: "kopi", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Vanilla",
-        price: 25000,
-        ingredients: [
-          { name: "sirup", amount: 15, unit: "ml" },
-          { name: "creamer", amount: 20, unit: "ml" },
-          { name: "gula", amount: 5, unit: "ml" },
-          { name: "kopi", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Kopi Matcha",
-        price: 25000,
-        ingredients: [
-          { name: "matcha", amount: 20, unit: "ml" },
-          { name: "kopi", amount: 20, unit: "ml" },
-          { name: "gula", amount: 10, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Spanish latte",
-        price: 23000,
-        ingredients: [
-          { name: "skm", amount: 20, unit: "ml" },
-          { name: "creamer", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-          { name: "kopi", amount: 15, unit: "ml" },
-        ],
-      },
+let stock = {};   
+let sales = {};   
 
-      // Mocktail
-      {
-        name: "Kiwi kiss",
-        price: 28000,
-        ingredients: [
-          { name: "markisa", amount: 15, unit: "ml" },
-          { name: "kiwi", amount: 7, unit: "ml" },
-          { name: "lemon tea", amount: 10, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Summer glow",
-        price: 25000,
-        ingredients: [
-          { name: "manggo sauce", amount: 15, unit: "ml" },
-          { name: "sirup strawberry", amount: 10, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Ocean blue",
-        price: 28000,
-        ingredients: [
-          { name: "Strawberry sauce", amount: 20, unit: "ml" },
-          { name: "blue curacao", amount: 10, unit: "ml" },
-          { name: "mint", amount: 5, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Flora pop",
-        price: 23000,
-        ingredients: [
-          { name: "honey", amount: 15, unit: "ml" },
-          { name: "rashberry", amount: 10, unit: "ml" },
-          { name: "jasmine", amount: 5, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Lembayung senja",
-        price: 28000,
-        ingredients: [
-          { name: "Lemon tea", amount: 10, unit: "ml" },
-          { name: "Wildberries", amount: 10, unit: "ml" },
-          { name: "Blue curacao", amount: 15, unit: "ml" },
-          { name: "Lychee", amount: 15, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Midnight bloom",
-        price: 25000,
-        ingredients: [
-          { name: "wildberry", amount: 20, unit: "ml" },
-          { name: "mint", amount: 10, unit: "ml" },
-          { name: "kopi", amount: 15, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Dark moon",
-        price: 25000,
-        ingredients: [
-          { name: "kiwi", amount: 20, unit: "ml" },
-          { name: "blue curacao", amount: 10, unit: "ml" },
-          { name: "kopi", amount: 10, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Tropical zing",
-        price: 25000,
-        ingredients: [
-          { name: "kiwi", amount: 20, unit: "ml" },
-          { name: "lychee", amount: 10, unit: "ml" },
-          { name: "lemon tea", amount: 10, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Honey smooth",
-        price: 28000,
-        ingredients: [
-          { name: "honey", amount: 10, unit: "ml" },
-          { name: "wildberry", amount: 15, unit: "ml" },
-          { name: "jasmine", amount: 8, unit: "ml" },
-          { name: "lemon tea", amount: 10, unit: "ml" },
-          { name: "soda", amount: 100, unit: "ml" },
-        ],
-      },
+function normalize(name) {
+  return name.toLowerCase().trim().replace(/\s+/g, "");
+}
 
-      // Non coffee (bubuk / base)
-      {
-        name: "Matcha",
-        price: 23000,
-        ingredients: [
-          { name: "Base", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Taro",
-        price: 23000,
-        ingredients: [
-          { name: "base", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Coklat",
-        price: 23000,
-        ingredients: [
-          { name: "base", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Cookies and cream",
-        price: 23000,
-        ingredients: [
-          { name: "base", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Red Velvet",
-        price: 23000,
-        ingredients: [
-          { name: "base", amount: 20, unit: "ml" },
-          { name: "susu", amount: 100, unit: "ml" },
-        ],
-      },
-      {
-        name: "Lemon tea",
-        price: 15000,
-        ingredients: [
-          { name: "base", amount: 1, unit: "unit" },
-          { name: "air", amount: 200, unit: "ml" },
-        ],
-      },
-    ];
+/* ======================================================
+   LOAD STOK DARI GOOGLE SHEET
+====================================================== */
+async function loadStock() {
+  const res = await fetch(SCRIPT_URL + "?action=getStock");
+  const data = await res.json();
+  stock = data.stock || {};
+  renderStockTable();
+}
+loadStock();
 
-    // Kategori menu untuk tampilan input penjualan
-    const menuCategories = {
-      "Hot Coffee": ["Cappucino", "Caffe latte", "Split", "Magic"],
-      "Non Coffee": ["Matcha", "Red Velvet", "Taro", "Coklat", "Cookies and cream", "Lemon tea"],
-      "Mocktail": [
-        "Kiwi kiss",
-        "Summer glow",
-        "Ocean blue",
-        "Flora pop",
-        "Lembayung senja",
-        "Midnight bloom",
-        "Dark moon",
-        "Tropical zing",
-        "Honey smooth",
-      ],
-      "Kopi Susu": [
-        "Clasic Almond",
-        "Banana",
-        "Caramel",
-        "Vanilla",
-        "Brown sugar",
-        "Butter scoot",
-        "Kopi Matcha",
-        "Spanish latte",
-      ],
-    };
+/* ======================================================
+   HITUNG PENJUALAN
+====================================================== */
+document.querySelectorAll(".qty-input").forEach(input => {
+  input.addEventListener("input", () => {
+    const menu = input.dataset.menu;
+    sales[menu] = parseInt(input.value) || 0;
+  });
+});
 
-    // Normalisasi nama bahan
-    function normalizeIngredient(name) {
-      return name
-        .toLowerCase()
-        .trim()
-        .replace(/s$/, "")
-        .replace(/\s+/g, "");
+document.getElementById("btn-calc").onclick = () => {
+  const output = [];
+  Object.entries(sales).forEach(([menu, qty]) => {
+    if (qty > 0) {
+      output.push(`<div class='border p-2 rounded bg-gray-50 mb-2'>${menu}: <b>${qty}</b></div>`);
     }
+  });
 
-    // Stok default (fallback kalau GAS gagal)
-    const defaultStock = {
-      sirup: { current: 3000, safe: 1000, unit: "ml" },
-      "sirup mur": { current: 1500, safe: 500, unit: "ml" },
-      "sirup strawberry": { current: 1000, safe: 300, unit: "ml" },
-      creamer: { current: 2500, safe: 800, unit: "ml" },
-      gula: { current: 2000, safe: 500, unit: "ml" },
-      kopi: { current: 1800, safe: 600, unit: "ml" },
-      susu: { current: 10000, safe: 2000, unit: "ml" },
-      skm: { current: 1200, safe: 400, unit: "ml" },
-      matcha: { current: 800, safe: 200, unit: "ml" },
-      "Strawberry sauce": { current: 900, safe: 300, unit: "ml" },
-      "manggo sauce": { current: 800, safe: 250, unit: "ml" },
-      markisa: { current: 700, safe: 200, unit: "ml" },
-      kiwi: { current: 600, safe: 150, unit: "ml" },
-      "blue curacao": { current: 500, safe: 100, unit: "ml" },
-      lychee: { current: 400, safe: 100, unit: "ml" },
-      "Lemon tea": { current: 1200, safe: 400, unit: "ml" },
-      wildberry: { current: 500, safe: 150, unit: "ml" },
-      Wildberries: { current: 500, safe: 150, unit: "ml" },
-      honey: { current: 800, safe: 300, unit: "ml" },
-      jasmine: { current: 400, safe: 100, unit: "ml" },
-      mint: { current: 300, safe: 100, unit: "ml" },
-      soda: { current: 15000, safe: 3000, unit: "ml" },
-      base: { current: 2000, safe: 500, unit: "ml" },
-      air: { current: 50000, safe: 10000, unit: "ml" },
-      rashberry: { current: 300, safe: 100, unit: "ml" },
-    };
+  document.getElementById("calc-table").innerHTML = output.join("");
+  document.getElementById("calc-result").classList.remove("hidden");
+};
 
-    // ==============================
-    // STATE & DOM ELEMENTS
-    // ==============================
-    let sales = {};
-    menuRecipes.forEach((m) => {
-      sales[m.name] = 0;
-    });
+/* ======================================================
+   UPDATE STOK
+====================================================== */
+document.getElementById("btn-update-stock").onclick = async () => {
+  for (let key in stock) {
+    stock[key].current -= 10; // contoh
+  }
 
-    let stock = JSON.parse(JSON.stringify(defaultStock));
-    let ingredientUsage = [];
-    let simulateMode = true;
-    let lastTotalRevenue = 0;
-    let activeCategory = "Hot Coffee";
+  await fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "saveUsage", stock }),
+  });
 
-    const menuListEl = document.getElementById("menu-list");
-    const categoryTabsEl = document.getElementById("category-tabs");
-    const revenueEl = document.getElementById("revenue");
-    const totalIngredientsEl = document.getElementById("total-ingredients");
-    const modeToggleEl = document.getElementById("mode-toggle");
-    const modeToggleBgEl = document.getElementById("mode-toggle-bg");
-    const modeToggleKnobEl = document.getElementById("mode-toggle-knob");
-    const modeLabelEl = document.getElementById("mode-label");
-    const criticalTitleEl = document.getElementById("critical-title");
-    const criticalListEl = document.getElementById("critical-list");
-    const resultSectionEl = document.getElementById("result-section");
-    const usageTableBodyEl = document.getElementById("usage-table-body");
-    const btnUpdateEl = document.getElementById("btn-update");
-    const btnUpdateTextEl = document.getElementById("btn-update-text");
-    const btnResetEl = document.getElementById("btn-reset");
+  alert("Stok berhasil di-update!");
+  loadStock();
+};
 
-    document.getElementById("year").textContent = new Date().getFullYear();
+/* ======================================================
+   NAVIGATION
+====================================================== */
+const pageCalc = document.getElementById("page-calc");
+const pageStock = document.getElementById("page-stock");
 
-    // ==============================
-    // UI HELPERS
-    // ==============================
-    function updateModeUI() {
-      if (simulateMode) {
-        modeToggleEl.checked = false;
-        modeToggleBgEl.classList.remove("bg-green-500");
-        modeToggleBgEl.classList.add("bg-gray-300");
-        modeToggleKnobEl.classList.remove("translate-x-6");
-        modeLabelEl.textContent = "Simulasi";
-        btnUpdateTextEl.textContent = "Hitung Kebutuhan";
-      } else {
-        modeToggleEl.checked = true;
-        modeToggleBgEl.classList.remove("bg-gray-300");
-        modeToggleBgEl.classList.add("bg-green-500");
-        modeToggleKnobEl.classList.add("translate-x-6");
-        modeLabelEl.textContent = "Update Stok";
-        btnUpdateTextEl.textContent = "Hitung & Kurangi Stok";
-      }
-    }
+document.getElementById("nav-calc").onclick = () => {
+  pageCalc.classList.remove("hidden");
+  pageStock.classList.add("hidden");
+};
 
-    function createCategoryTabsUI() {
-      categoryTabsEl.innerHTML = "";
-      Object.keys(menuCategories).forEach((cat) => {
-        const btn = document.createElement("button");
-        btn.textContent = cat;
-        btn.className =
-          "category-tab px-3 py-1.5 rounded-full text-xs md:text-sm border transition-colors";
-        if (cat === activeCategory) {
-          btn.classList.add("bg-amber-500", "text-white", "border-amber-500");
-        } else {
-          btn.classList.add(
-            "bg-white",
-            "text-gray-700",
-            "border-gray-200",
-            "hover:bg-gray-100"
-          );
-        }
-        btn.addEventListener("click", () => {
-          activeCategory = cat;
-          createCategoryTabsUI();
-          createMenuListUI();
-        });
-        categoryTabsEl.appendChild(btn);
-      });
-    }
+document.getElementById("nav-stock").onclick = () => {
+  pageCalc.classList.add("hidden");
+  pageStock.classList.remove("hidden");
+};
 
-    function createMenuListUI() {
-      menuListEl.innerHTML = "";
-      let menusToRender;
-      if (activeCategory && menuCategories[activeCategory]) {
-        const allowed = new Set(menuCategories[activeCategory]);
-        menusToRender = menuRecipes.filter((m) => allowed.has(m.name));
-      } else {
-        menusToRender = menuRecipes;
-      }
+/* ======================================================
+   STOCK TABLE
+====================================================== */
+function renderStockTable() {
+  const tbody = document.getElementById("stock-table-body");
+  tbody.innerHTML = "";
 
-      menusToRender.forEach((menu) => {
-        const card = document.createElement("div");
-        card.className =
-          "border border-gray-200 rounded-xl p-3 hover:shadow-md transition-shadow bg-white";
+  Object.entries(stock).forEach(([key, s]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="border px-2 py-1">${key}</td>
+      <td class="border px-2 py-1">${s.current}</td>
+      <td class="border px-2 py-1">${s.safe}</td>
+      <td class="border px-2 py-1">${s.unit}</td>
+      <td class="border px-2 py-1">
+        <button class="btn-edit bg-blue-500 text-white px-2 py-1 rounded" data-key="${key}">
+          Edit
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-        const topRow = document.createElement("div");
-        topRow.className = "flex justify-between items-start gap-2";
+  document.querySelectorAll(".btn-edit").forEach(btn => {
+    btn.onclick = () => openStockForm(btn.dataset.key);
+  });
+}
 
-        const info = document.createElement("div");
-        const title = document.createElement("h3");
-        title.className = "font-medium text-gray-800";
-        title.textContent = menu.name;
+/* ======================================================
+   FORM EDIT / ADD
+====================================================== */
+function openStockForm(key) {
+  const form = document.getElementById("stock-form");
+  form.classList.remove("hidden");
 
-        const price = document.createElement("p");
-        price.className = "text-xs text-gray-500";
-        price.textContent = `Rp ${menu.price.toLocaleString("id-ID")}`;
+  if (key) {
+    document.getElementById("form-title").innerText = "Edit Stok";
+    document.getElementById("form-name").value = key;
+    document.getElementById("form-current").value = stock[key].current;
+    document.getElementById("form-safe").value = stock[key].safe;
+    document.getElementById("form-unit").value = stock[key].unit;
+  } else {
+    document.getElementById("form-title").innerText = "Tambah Stok Baru";
+    document.getElementById("form-name").value = "";
+    document.getElementById("form-current").value = "";
+    document.getElementById("form-safe").value = "";
+    document.getElementById("form-unit").value = "";
+  }
 
-        info.appendChild(title);
-        info.appendChild(price);
+  document.getElementById("form-save").onclick = saveStock;
+}
 
-        const input = document.createElement("input");
-        input.type = "number";
-        input.min = "0";
-        input.value = sales[menu.name] ?? 0;
-        input.className =
-          "menu-qty-input w-20 px-2 py-1 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm";
-        input.addEventListener("input", (e) => {
-          handleSaleChange(menu.name, e.target.value);
-        });
+document.getElementById("form-cancel").onclick = () => {
+  document.getElementById("stock-form").classList.add("hidden");
+};
 
-        topRow.appendChild(info);
-        topRow.appendChild(input);
-        card.appendChild(topRow);
-        menuListEl.appendChild(card);
-      });
-    }
+/* ======================================================
+   SIMPAN PERUBAHAN STOK
+====================================================== */
+async function saveStock() {
+  const name = normalize(document.getElementById("form-name").value);
+  const current = parseFloat(document.getElementById("form-current").value);
+  const safe = parseFloat(document.getElementById("form-safe").value);
+  const unit = document.getElementById("form-unit").value;
 
-    // ==============================
-    // PERHITUNGAN KEBUTUHAN BAHAN
-    // ==============================
-    function calculateIngredientUsage() {
-      const usageMap = {};
+  stock[name] = { current, safe, unit };
 
-      Object.entries(sales).forEach(([menuName, qty]) => {
-        const jumlah = parseInt(qty, 10) || 0;
-        if (jumlah <= 0) return;
-        const menu = menuRecipes.find((m) => m.name === menuName);
-        if (!menu) return;
+  await fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "saveUsage", stock })
+  });
 
-        menu.ingredients.forEach(({ name, amount, unit }) => {
-          const key = normalizeIngredient(name);
-          if (!usageMap[key]) {
-            usageMap[key] = { total: 0, unit, displayNames: new Set() };
-          }
-          usageMap[key].total += amount * jumlah;
-          usageMap[key].displayNames.add(name);
-        });
-      });
+  alert("Stok disimpan!");
+  document.getElementById("stock-form").classList.add("hidden");
+  loadStock();
+}
 
-      const result = [];
-      Object.entries(usageMap).forEach(([key, data]) => {
-        const stockInfo = stock[key] || { current: 0, safe: 0, unit: data.unit };
-        let status = "safe";
-        if (stockInfo.current < stockInfo.safe * 0.5) status = "critical";
-        else if (stockInfo.current < stockInfo.safe) status = "warning";
+</script>
 
-        result.push({
-          key,
-          displayName: Array.from(data.displayNames).join(" / "),
-          total: Math.round(data.total * 100) / 100,
-          unit: data.unit,
-          currentStock: stockInfo.current,
-          safeStock: stockInfo.safe,
-          status,
-        });
-      });
-
-      result.sort((a, b) => b.total - a.total);
-      return result;
-    }
-
-    function recalcAll() {
-      ingredientUsage = calculateIngredientUsage();
-
-      // Hitung revenue
-      let totalRevenue = 0;
-      menuRecipes.forEach((menu) => {
-        const qty = parseInt(sales[menu.name] || 0, 10) || 0;
-        totalRevenue += qty * menu.price;
-      });
-      lastTotalRevenue = totalRevenue;
-      revenueEl.textContent = "Rp " + totalRevenue.toLocaleString("id-ID");
-
-      totalIngredientsEl.textContent = ingredientUsage.length.toString();
-
-      const disabled = ingredientUsage.length === 0;
-      btnUpdateEl.disabled = disabled;
-
-      const critical = ingredientUsage.filter((i) => i.status === "critical");
-      criticalListEl.innerHTML = "";
-      if (critical.length > 0) {
-        criticalTitleEl.textContent = `${critical.length} Bahan Kritis`;
-        criticalTitleEl.className = "font-medium text-red-600";
-
-        critical.forEach((item) => {
-          const li = document.createElement("li");
-          li.className = "flex justify-between text-sm";
-          li.innerHTML = `
-            <span class="font-medium">${item.displayName}</span>
-            <span class="text-red-600 font-mono">${item.currentStock} ${item.unit}</span>
-          `;
-          criticalListEl.appendChild(li);
-        });
-      } else {
-        criticalTitleEl.textContent = "Stok Aman";
-        criticalTitleEl.className = "font-medium text-green-600";
-        const li = document.createElement("li");
-        li.textContent = "Tidak ada bahan di bawah batas aman.";
-        li.className = "text-sm text-gray-500";
-        criticalListEl.appendChild(li);
-      }
-
-      if (ingredientUsage.length === 0) {
-        resultSectionEl.classList.add("hidden");
-        usageTableBodyEl.innerHTML = "";
-        return;
-      }
-
-      resultSectionEl.classList.remove("hidden");
-      usageTableBodyEl.innerHTML = "";
-
-      ingredientUsage.forEach((item) => {
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-gray-50";
-
-        let statusBadge = "";
-        if (item.status === "critical") {
-          statusBadge =
-            '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">⚠️ Kritis</span>';
-        } else if (item.status === "warning") {
-          statusBadge =
-            '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">⚠️ Peringatan</span>';
-        } else {
-          statusBadge =
-            '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">✔ Aman</span>';
-        }
-
-        tr.innerHTML = `
-          <td class="px-4 py-3 font-medium text-gray-800">${item.displayName}</td>
-          <td class="px-4 py-3 text-right font-mono text-amber-700">${item.total} ${item.unit}</td>
-          <td class="px-4 py-3 text-right font-mono">${item.currentStock} ${item.unit}</td>
-          <td class="px-4 py-3 text-center">${statusBadge}</td>
-        `;
-        usageTableBodyEl.appendChild(tr);
-      });
-    }
-
-    // ==============================
-    // GOOGLE SHEET INTEGRATION
-    // ==============================
-    function loadStockFromSheet() {
-      if (!SCRIPT_URL) {
-        recalcAll();
-        return;
-      }
-
-      fetch(SCRIPT_URL + "?action=getStock")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.stock) {
-            stock = Object.assign({}, stock, data.stock);
-          }
-          recalcAll();
-        })
-        .catch((err) => {
-          console.error("Gagal load stok dari Google Sheet:", err);
-          recalcAll();
-        });
-    }
-
-    function saveUsageToSheet(usageSnapshot, revenueSnapshot) {
-      if (!SCRIPT_URL) {
-        console.warn("SCRIPT_URL belum diisi, skip kirim ke Google Sheet.");
-        return;
-      }
-
-      const payload = {
-        action: "saveUsage",
-        date: new Date().toISOString(),
-        usage: usageSnapshot,
-        revenue: revenueSnapshot,
-        stock: stock,
-      };
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
-        .then(() => {
-          console.log("Data penggunaan bahan terkirim ke Google Sheet.");
-        })
-        .catch((err) => {
-          console.error("Gagal kirim data ke Google Sheet:", err);
-        });
-    }
-
-    // ==============================
-    // EVENT HANDLERS
-    // ==============================
-    function handleSaleChange(menuName, value) {
-      const num = Math.max(0, parseInt(value || "0", 10) || 0);
-      sales[menuName] = num;
-      recalcAll();
-    }
-
-    function resetSales() {
-      menuRecipes.forEach((menu) => {
-        sales[menu.name] = 0;
-      });
-      document.querySelectorAll(".menu-qty-input").forEach((input) => {
-        input.value = "0";
-      });
-      recalcAll();
-    }
-
-    btnUpdateEl.addEventListener("click", () => {
-      if (ingredientUsage.length === 0) {
-        alert("Isi dulu penjualan hari ini.");
-        return;
-      }
-
-      const usageSnapshot = JSON.parse(JSON.stringify(ingredientUsage));
-      const revenueSnapshot = lastTotalRevenue;
-
-      if (!simulateMode) {
-        usageSnapshot.forEach((item) => {
-          const key = item.key;
-          if (!stock[key]) {
-            stock[key] = { current: 0, safe: 0, unit: item.unit };
-          }
-          const current = parseFloat(stock[key].current || 0);
-          const after = current - item.total;
-          stock[key].current = after > 0 ? Math.round(after * 100) / 100 : 0;
-        });
-      }
-
-      saveUsageToSheet(usageSnapshot, revenueSnapshot);
-      resetSales();
-    });
-
-    modeToggleEl.addEventListener("change", () => {
-      simulateMode = !simulateMode;
-      updateModeUI();
-    });
-
-    btnResetEl.addEventListener("click", () => {
-      resetSales();
-    });
-
-    // ==============================
-    // INIT
-    // ==============================
-    function init() {
-      createCategoryTabsUI();
-      createMenuListUI();
-      updateModeUI();
-      loadStockFromSheet();
-    }
-
-    window.addEventListener("DOMContentLoaded", init);
-  </script>
 </body>
 </html>
